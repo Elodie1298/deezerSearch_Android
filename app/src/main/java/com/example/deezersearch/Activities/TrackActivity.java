@@ -21,6 +21,7 @@ import com.example.deezersearch.R;
 import com.example.deezersearch.Util.Adapter.TrackAdapter;
 import com.example.deezersearch.Util.GsonRequest;
 import com.example.deezersearch.Util.MediaUtil;
+import com.example.deezersearch.Util.PlaybarUtil;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -39,6 +40,8 @@ public class TrackActivity extends AppCompatActivity {
         Intent myIntent = getIntent();
         url = myIntent.getStringExtra("tracklist");
         cover = myIntent.getStringExtra("cover");
+        ImageView coverView = findViewById(R.id.track_tool_cover);
+        Picasso.get().load(cover).into(coverView);
 
         recyclerView = findViewById(R.id.music_list);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
@@ -55,50 +58,26 @@ public class TrackActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(Object response) {
                                 tracklist = ((TrackData) response).getTracks();
+                                MediaUtil.setTracklist(tracklist);
                                 RecyclerView.Adapter adapter = new TrackAdapter(tracklist, context);
                                 recyclerView.setAdapter(adapter);
                             }
                         }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-
+                        System.out.println(error);
                     }
                 });
 
         queue.add(gsonRequest);
 
-        final FloatingActionButton playButton = findViewById(R.id.track_tool_play);
-        playButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (MediaUtil.isPaused()) {
-                    playButton.setImageResource(android.R.drawable.ic_media_pause);
-                } else {
-                    playButton.setImageResource(android.R.drawable.ic_media_play);
-                }
-                MediaUtil.toolPlay(tracklist);
-            }
-        });
-
-        final FloatingActionButton previousButton = findViewById(R.id.track_tool_previous);
-        previousButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MediaUtil.playPrevious();
-            }
-        });
-
-        final FloatingActionButton nextButton = findViewById(R.id.track_tool_next);
-        nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MediaUtil.playNext();
-            }
-        });
+        PlaybarUtil.getInstance(this);
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
+        if (keyCode == KeyEvent.KEYCODE_BACK
+                || keyCode == KeyEvent.KEYCODE_HOME
+                || keyCode == KeyEvent.KEYCODE_APP_SWITCH) {
             MediaUtil.release();
             finish();
             return true;
@@ -106,12 +85,10 @@ public class TrackActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    public void setPlayingTrack(Track track) {
-        ImageView coverView = findViewById(R.id.track_tool_cover);
+    public void setPlayingTrackInfo(Track track) {
         TextView title = findViewById(R.id.track_tool_title);
         TextView artist = findViewById(R.id.track_tool_artist);
 
-        Picasso.get().load(cover).into(coverView);
         title.setText(track.getTitle());
         artist.setText(track.getArtist().getName());
     }

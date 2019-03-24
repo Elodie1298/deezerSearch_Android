@@ -1,6 +1,5 @@
 package com.example.deezersearch.Util.Adapter;
 
-import android.provider.MediaStore;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,8 +12,8 @@ import com.example.deezersearch.Activities.TrackActivity;
 import com.example.deezersearch.Model.Track;
 import com.example.deezersearch.R;
 import com.example.deezersearch.Util.MediaUtil;
+import com.example.deezersearch.Util.PlaybarUtil;
 
-import java.io.IOException;
 import java.util.List;
 
 public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> {
@@ -22,6 +21,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
     private List<Track> dataSet;
     private ViewGroup parent;
     private TrackActivity trackActivity;
+    private PlaybarUtil playbarUtil;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -42,6 +42,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
     public TrackAdapter(List<Track> myDataset, TrackActivity context) {
         dataSet = myDataset;
         trackActivity = context;
+        playbarUtil = PlaybarUtil.getInstance(context);
     }
 
     // Create new views (invoked by the layout manager)
@@ -65,22 +66,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
         holder.imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Track track = dataSet.get(position);
-                if (MediaUtil.getCurrentTrack()!=null && MediaUtil.getCurrentTrack().equals(track)) {
-                    if (MediaUtil.isPaused()) {
-                        MediaUtil.play();
-                        imageButton.setImageResource(android.R.drawable.ic_media_pause);
-                    } else {
-                        MediaUtil.pause();
-                        imageButton.setImageResource(android.R.drawable.ic_media_play);
-                    }
-                } else {
-                    MediaUtil.stop();
-                    MediaUtil.prepare(dataSet, position);
-                    MediaUtil.play();
-                    trackActivity.setPlayingTrack(dataSet.get(position));
-                    imageButton.setImageResource(android.R.drawable.ic_media_pause);
-                }
+                playbarUtil.playpause(dataSet, position);
             }
         });
     }

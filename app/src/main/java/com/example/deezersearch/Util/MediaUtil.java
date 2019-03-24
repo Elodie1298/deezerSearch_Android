@@ -43,17 +43,12 @@ public class MediaUtil {
         currentTrack = track;
     }
 
-    public static void play() {
+    protected static void play() {
         mediaPlayer.start();
     }
 
-    public static void pause() {
+    protected static void pause() {
         mediaPlayer.pause();
-    }
-
-    public static void stop() {
-        mediaPlayer.stop();
-        currentTrack = null;
     }
 
     public static boolean isPaused() {
@@ -68,7 +63,7 @@ public class MediaUtil {
         mediaPlayer.reset();
     }
 
-    public static void playNext() {
+    public static Track playNext() {
         try {
             position = (position+1) % tracklist.size();
             prepare(tracklist.get(position));
@@ -77,9 +72,10 @@ public class MediaUtil {
             position--;
             e.printStackTrace();
         }
+        return tracklist.get(position);
     }
 
-    public static void playPrevious() {
+    public static Track playPrevious() {
         try {
             position = (position-1) % tracklist.size();
             prepare(tracklist.get(position));
@@ -88,14 +84,18 @@ public class MediaUtil {
             position++;
             e.printStackTrace();
         }
+        return tracklist.get(position);
     }
 
-    public static void toolPlay(List<Track> tracklist) {
+    public static void setTracklist(List<Track> tracklist) {
         MediaUtil.tracklist = tracklist;
-        if (mediaPlayer.isPlaying()) {
-            pause();
-        } else {
-            playNext();
-        }
+    }
+
+    public static List<Track> getTracklist() {
+        return tracklist;
+    }
+
+    protected static int getPosition() {
+        return position;
     }
 }
