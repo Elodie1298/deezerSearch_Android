@@ -16,9 +16,9 @@ import com.example.deezersearch.Util.Adapter.AlbumAdapter;
 import com.example.deezersearch.Util.GsonRequest;
 
 public class ArtistActivity extends AppCompatActivity {
-    private static String url = "https://api.deezer.com/2.0/search/album?q=artist:";
+    private static String url = "https://api.deezer.com/2.0/artist/";
     private RecyclerView recyclerView;
-    private String artistName;
+    private int artistId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +26,7 @@ public class ArtistActivity extends AppCompatActivity {
         setContentView(R.layout.activity_artist);
 
         Intent myIntent = getIntent();
-        artistName = myIntent.getStringExtra("artist");
+        artistId = Integer.parseInt(myIntent.getStringExtra("artist"));
 
         recyclerView = findViewById(R.id.album_list);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
@@ -35,7 +35,7 @@ public class ArtistActivity extends AppCompatActivity {
 
         final RequestQueue queue = Volley.newRequestQueue(this);
 
-        String requestUrl = url + "'" + artistName + "'";
+        String requestUrl = url + artistId + "/albums";
         GsonRequest gsonRequest =
                 new GsonRequest(requestUrl, AlbumData.class, null,
                         new Response.Listener() {
